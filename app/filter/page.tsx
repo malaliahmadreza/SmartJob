@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState } from 'react';
 
@@ -170,164 +170,228 @@ export default function FilterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">Skill Filtering Plan</h1>
-
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Select Your Skills (up to 10)</h2>
-            <button
-              onClick={() => setShowSkills(prev => !prev)}
-              className="text-sm text-blue-600 hover:text-blue-800"
-            >
-              {showSkills ? 'Hide' : 'Show'} skills
-            </button>
-          </div>
-
-          {showSkills ? (
-            <>
-              <input
-                type="text"
-                placeholder="Search skills..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
-                {filteredSkills.map(skill => (
-                  <label key={skill} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedSkills.includes(skill)}
-                      onChange={() => handleSkillToggle(skill)}
-                      disabled={!selectedSkills.includes(skill) && selectedSkills.length >= 10}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-sm">{skill}</span>
-                  </label>
-                ))}
+    <div className="min-h-screen bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <section className="overflow-hidden rounded-[2rem] bg-gradient-to-r from-sky-600 via-cyan-500 to-emerald-500 px-8 py-10 text-white shadow-2xl shadow-slate-900/15 ring-1 ring-white/10 sm:px-12">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-sky-100/80">SmartJob filter</p>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+                Build polished skill and location filters in seconds.
+              </h1>
+              <p className="mt-4 max-w-2xl text-sky-100/90 text-base leading-7">
+                Use the latest UI flow for selecting LinkedIn-ready skills and European cities, with search, country grouping, and a crisp card-based layout.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl bg-white/10 px-5 py-6 ring-1 ring-white/20 backdrop-blur">
+                <p className="text-sm uppercase tracking-[0.24em] text-sky-100/80">Skills selected</p>
+                <p className="mt-3 text-4xl font-semibold">{selectedSkills.length}</p>
               </div>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-2">Selected Skills ({selectedSkills.length}/10):</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedSkills.length === 0 && (
-                    <span className="text-sm text-gray-500">No skills selected yet.</span>
-                  )}
-                  {selectedSkills.map(skill => (
-                    <span key={skill} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                      {skill}
-                      <button
-                        onClick={() => handleSkillToggle(skill)}
-                        className="ml-2 text-blue-600 hover:text-blue-800"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
+              <div className="rounded-3xl bg-white/10 px-5 py-6 ring-1 ring-white/20 backdrop-blur">
+                <p className="text-sm uppercase tracking-[0.24em] text-sky-100/80">Locations selected</p>
+                <p className="mt-3 text-4xl font-semibold">{selectedCities.length}</p>
               </div>
-            </>
-          ) : (
-            <p className="text-sm text-gray-500">Skill selection is hidden. Click show to expand the list.</p>
-          )}
-        </div>
-
-        <div className="text-center">
-          <button
-            className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-colors"
-            disabled={selectedSkills.length === 0}
-          >
-            Continue with Selected Skills
-          </button>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6 mt-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Location Filter</h2>
-            <button
-              onClick={() => setShowLocation(prev => !prev)}
-              className="text-sm text-blue-600 hover:text-blue-800"
-            >
-              {showLocation ? 'Hide' : 'Show'} locations
-            </button>
+            </div>
           </div>
+        </section>
 
-          {showLocation ? (
-            <>
-              <div className="grid gap-4 mb-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Search cities or countries</label>
+        <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
+          <section className="rounded-[2rem] bg-white p-6 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-900">Skill Planner</h2>
+                <p className="mt-2 text-sm text-slate-500">Search, select, and preview the top skills for your job filters.</p>
+              </div>
+              <button
+                onClick={() => setShowSkills(prev => !prev)}
+                className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-100"
+              >
+                {showSkills ? 'Hide' : 'Show'} skills
+              </button>
+            </div>
+
+            {showSkills ? (
+              <div className="mt-6 space-y-6">
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                  <label className="block text-sm font-medium text-slate-700">Search skills</label>
                   <input
                     type="text"
-                    placeholder="Search cities or countries..."
-                    value={citySearch}
-                    onChange={e => setCitySearch(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. Financial modeling, Power BI, SQL"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Select a country</label>
-                  <select
-                    value={selectedCountry}
-                    onChange={e => handleCountrySelect(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Choose a country</option>
-                    {allCountries.map(country => (
-                      <option key={country} value={country}>
-                        {country}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
 
-              {selectedCountry && (
-                <p className="mb-4 text-sm text-gray-600">
-                  All cities in <strong>{selectedCountry}</strong> are selected.
-                </p>
-              )}
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-                {filteredCities.map(city => (
-                  <label key={city.name} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedCities.includes(city.name)}
-                      onChange={() => handleCityToggle(city.name)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-sm">{city.name}, {city.country}</span>
-                  </label>
-                ))}
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-2">Selected Locations:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedCities.length === 0 && (
-                    <span className="text-sm text-gray-500">No locations selected yet.</span>
-                  )}
-                  {selectedCities.map(city => (
-                    <span key={city} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                      {city}
-                      <button
-                        onClick={() => handleCityToggle(city)}
-                        className="ml-2 text-green-600 hover:text-green-800"
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {filteredSkills.map(skill => {
+                    const selected = selectedSkills.includes(skill);
+                    return (
+                      <label
+                        key={skill}
+                        className={`cursor-pointer rounded-full border px-4 py-3 text-sm font-medium transition ${selected ? 'bg-sky-600 text-white border-sky-600 shadow-lg shadow-sky-600/10' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'}`}
                       >
-                        ×
-                      </button>
-                    </span>
-                  ))}
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => handleSkillToggle(skill)}
+                          disabled={!selected && selectedSkills.length >= 10}
+                          className="sr-only"
+                        />
+                        {skill}
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <div className="rounded-[1.75rem] bg-slate-50 p-5 border border-slate-200">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Selected {selectedSkills.length} / 10</span>
+                    <p className="text-sm text-slate-500">Tap a tag to remove it.</p>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {selectedSkills.length === 0 ? (
+                      <span className="text-sm text-slate-500">No skills selected yet.</span>
+                    ) : (
+                      selectedSkills.map(skill => (
+                        <button
+                          key={skill}
+                          onClick={() => handleSkillToggle(skill)}
+                          className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-2 text-sm font-medium text-sky-900 transition hover:bg-sky-200"
+                        >
+                          {skill}
+                          <span className="rounded-full bg-sky-200 px-2 py-0.5 text-xs">×</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
-            </>
-          ) : (
-            <p className="text-sm text-gray-500">Location selection is hidden. Click show to expand city filters.</p>
-          )}
+            ) : (
+              <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
+                Skill selection is hidden. Click show to expand the choice panel.
+              </div>
+            )}
+
+            <button
+              className="mt-8 w-full rounded-full bg-slate-900 px-6 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={selectedSkills.length === 0}
+            >
+              Continue with selected skills
+            </button>
+          </section>
+
+          <section className="rounded-[2rem] bg-white p-6 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-900">Location Filter</h2>
+                <p className="mt-2 text-sm text-slate-500">Filter by EU cities or auto-select whole countries.</p>
+              </div>
+              <button
+                onClick={() => setShowLocation(prev => !prev)}
+                className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-100"
+              >
+                {showLocation ? 'Hide' : 'Show'} locations
+              </button>
+            </div>
+
+            {showLocation ? (
+              <div className="mt-6 space-y-6">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                    <label className="block text-sm font-medium text-slate-700">Search cities or countries</label>
+                    <input
+                      type="text"
+                      placeholder="Search cities or countries..."
+                      value={citySearch}
+                      onChange={e => setCitySearch(e.target.value)}
+                      className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100"
+                    />
+                  </div>
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                    <label className="block text-sm font-medium text-slate-700">Select a country</label>
+                    <select
+                      value={selectedCountry}
+                      onChange={e => handleCountrySelect(e.target.value)}
+                      className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100"
+                    >
+                      <option value="">Choose a country</option>
+                      {allCountries.map(country => (
+                        <option key={country} value={country}>
+                          {country}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {selectedCountry && (
+                  <div className="rounded-3xl border border-cyan-200 bg-cyan-50 px-4 py-4 text-sm text-cyan-800">
+                    All cities in <strong>{selectedCountry}</strong> are selected.
+                  </div>
+                )}
+
+                <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">City selection</p>
+                      <p className="text-sm text-slate-500">Tap a city to select or unselect it.</p>
+                    </div>
+                    <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">{filteredCities.length} visible</span>
+                  </div>
+
+                  <div className="max-h-[420px] space-y-3 overflow-y-auto pr-1">
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {filteredCities.map(city => {
+                        const selected = selectedCities.includes(city.name);
+                        return (
+                          <button
+                            key={city.name}
+                            type="button"
+                            onClick={() => handleCityToggle(city.name)}
+                            className={`text-left rounded-2xl border px-4 py-3 text-sm transition ${selected ? 'border-cyan-600 bg-cyan-600/10 text-slate-900 shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}
+                          >
+                            <span className="font-medium">{city.name}</span>
+                            <span className="block text-xs text-slate-500">{city.country}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-900">{selectedCities.length} selected</span>
+                    <p className="text-sm text-slate-500">Selected cities appear as removable tags.</p>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {selectedCities.length === 0 ? (
+                      <span className="text-sm text-slate-500">No locations selected yet.</span>
+                    ) : (
+                      selectedCities.map(city => (
+                        <button
+                          key={city}
+                          onClick={() => handleCityToggle(city)}
+                          className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-medium text-emerald-900 transition hover:bg-emerald-200"
+                        >
+                          {city}
+                          <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-xs">×</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
+                Location selection is hidden. Click show to expand city filters.
+              </div>
+            )}
+          </section>
         </div>
       </div>
     </div>
