@@ -11,13 +11,19 @@ SmartJob is a lightweight Next.js application built to support smarter job searc
   - choose all cities for a selected country
   - toggle visibility for skill and location sections
   - view and remove selected skills and cities
+  - filter jobs by posting time (Last 1hr to Last 30 days)
+  - view filtered job results with AND logic for skills matching
 
 ## Key Features
-- Skill search and selection UI
+- Skill search and selection UI (max 10 skills)
 - Location search with an expanded EU city dataset
 - Country-based bulk city selection
 - Collapsible skill and location sections
+- Time-based job posting filters
+- Job results display with skill matching (AND logic)
+- **Clickable job results** that open original LinkedIn job ads in new tabs
 - Selected items shown as removable tags
+- Minimized filters when results are shown
 
 ## Technology Stack
 - Next.js App Router
@@ -29,6 +35,7 @@ SmartJob is a lightweight Next.js application built to support smarter job searc
 - Development version complete and validated with `npm run build`
 - Project initialized as a Git repository and pushed to GitHub
 - Documentation created in `DOCUMENTARY.md`
+- Latest update: Implemented complete job search functionality with mock data, time-based filtering, AND logic for skills, and results display with proper styling
 
 ## Next Steps
 - Add a backend API for job matching

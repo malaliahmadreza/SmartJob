@@ -118,14 +118,104 @@ const euCities = [
 
 const allCountries = Array.from(new Set(euCities.map(city => city.country))).sort();
 
+const timeOptions = ['Last 1hr', 'Last 6hr', 'Last 12hr', 'Last 24hr', 'Last 7 days', 'Last 10 days', 'Last 30 days'];
+
+// Mock job data
+const mockJobs = [
+  {
+    id: 1,
+    title: 'Senior Data Analyst',
+    company: 'TechCorp GmbH',
+    city: 'Berlin',
+    description: 'We are looking for a Senior Data Analyst to join our team. You will work with large datasets, create dashboards, and provide insights to drive business decisions. Experience with SQL, Python, and Tableau required.',
+    skills: ['SQL (joins, aggregations, window functions)', 'Data analysis', 'Data visualization', 'Python', 'Tableau'],
+    postedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    url: 'https://www.linkedin.com/jobs/view/senior-data-analyst-at-techcorp-gmbh-1234567890',
+  },
+  {
+    id: 2,
+    title: 'Financial Analyst',
+    company: 'Finance Solutions Ltd',
+    city: 'London',
+    description: 'Join our finance team as a Financial Analyst. Responsibilities include financial modeling, budgeting, forecasting, and variance analysis. Strong Excel skills required.',
+    skills: ['Financial modeling', 'Budgeting', 'Forecasting', 'Variance analysis', 'Advanced Excel (pivot tables, Power Query, VBA basics)'],
+    postedAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+    url: 'https://www.linkedin.com/jobs/view/financial-analyst-at-finance-solutions-ltd-1234567891',
+  },
+  {
+    id: 3,
+    title: 'Business Intelligence Developer',
+    company: 'Data Insights Inc',
+    city: 'Amsterdam',
+    description: 'We need a BI Developer to create reports and dashboards. Experience with Power BI, SQL, and data warehousing is essential.',
+    skills: ['Power BI', 'SQL (joins, aggregations, window functions)', 'Data warehouses', 'Data visualization', 'Dashboard building'],
+    postedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+    url: 'https://www.linkedin.com/jobs/view/business-intelligence-developer-at-data-insights-inc-1234567892',
+  },
+  {
+    id: 4,
+    title: 'Data Engineer',
+    company: 'BigData Corp',
+    city: 'Paris',
+    description: 'Looking for a Data Engineer to build and maintain data pipelines. Experience with ETL, Python, and cloud platforms required.',
+    skills: ['ETL', 'Python', 'Data pipelines', 'Data engineering basics', 'SQL (joins, aggregations, window functions)'],
+    postedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    url: 'https://www.linkedin.com/jobs/view/data-engineer-at-bigdata-corp-1234567893',
+  },
+  {
+    id: 5,
+    title: 'Product Analyst',
+    company: 'E-commerce Plus',
+    city: 'Berlin',
+    description: 'Join our product team as an Analyst. You will analyze user behavior, run A/B tests, and provide recommendations for product improvements.',
+    skills: ['Data analysis', 'A/B testing', 'KPI tracking', 'SQL (joins, aggregations, window functions)', 'Data visualization'],
+    postedAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+    url: 'https://www.linkedin.com/jobs/view/product-analyst-at-e-commerce-plus-1234567894',
+  },
+  {
+    id: 6,
+    title: 'Financial Controller',
+    company: 'Global Finance Group',
+    city: 'Frankfurt',
+    description: 'Senior Financial Controller position available. Responsible for financial reporting, internal controls, and compliance.',
+    skills: ['Financial reporting', 'Internal controls', 'Compliance', 'Financial statements', 'Auditing'],
+    postedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+    url: 'https://www.linkedin.com/jobs/view/financial-controller-at-global-finance-group-1234567895',
+  },
+  {
+    id: 7,
+    title: 'Data Scientist',
+    company: 'AI Solutions GmbH',
+    city: 'Munich',
+    description: 'We are seeking a Data Scientist to work on machine learning projects. Experience with Python, statistical analysis, and hypothesis testing required.',
+    skills: ['Python', 'Statistical analysis', 'Hypothesis testing', 'Data analysis', 'Machine learning'],
+    postedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+    url: 'https://www.linkedin.com/jobs/view/data-scientist-at-ai-solutions-gmbh-1234567896',
+  },
+  {
+    id: 8,
+    title: 'Business Analyst',
+    company: 'Consulting Partners',
+    city: 'Vienna',
+    description: 'Business Analyst role focusing on process improvement and requirements gathering. Experience in stakeholder management and business case development.',
+    skills: ['Process analysis', 'Requirements gathering', 'Stakeholder management', 'Business case development', 'Strategic thinking'],
+    postedAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+    url: 'https://www.linkedin.com/jobs/view/business-analyst-at-consulting-partners-1234567897',
+  },
+];
+
 export default function FilterPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [citySearch, setCitySearch] = useState('');
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [showSkills, setShowSkills] = useState(true);
-  const [showLocation, setShowLocation] = useState(true);
+  const [selectedTime, setSelectedTime] = useState('Last 1hr');
+  const [continueMessage, setContinueMessage] = useState('');
+  const [showSkills, setShowSkills] = useState(false);
+  const [showLocation, setShowLocation] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [filteredJobs, setFilteredJobs] = useState<typeof mockJobs>([]);
 
   const filteredSkills = useMemo(
     () => allSkills.filter(skill => skill.toLowerCase().includes(searchTerm.toLowerCase())),
@@ -169,6 +259,49 @@ export default function FilterPage() {
     setSelectedCities(prev => Array.from(new Set([...prev, ...countryCities])));
   };
 
+  const getTimeThreshold = (timeOption: string) => {
+    const now = new Date();
+    switch (timeOption) {
+      case 'Last 1hr': return new Date(now.getTime() - 1 * 60 * 60 * 1000);
+      case 'Last 6hr': return new Date(now.getTime() - 6 * 60 * 60 * 1000);
+      case 'Last 12hr': return new Date(now.getTime() - 12 * 60 * 60 * 1000);
+      case 'Last 24hr': return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      case 'Last 7 days': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      case 'Last 10 days': return new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
+      case 'Last 30 days': return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      default: return new Date(0);
+    }
+  };
+
+  const handleContinue = () => {
+    const timeThreshold = getTimeThreshold(selectedTime);
+    
+    const filtered = mockJobs.filter(job => {
+      // Check posting time
+      if (job.postedAt < timeThreshold) return false;
+      
+      // Check skills (AND logic - job must have ALL selected skills)
+      if (selectedSkills.length > 0) {
+        const hasAllSkills = selectedSkills.every(skill => 
+          job.skills.some(jobSkill => jobSkill.toLowerCase().includes(skill.toLowerCase()) || 
+                                    skill.toLowerCase().includes(jobSkill.toLowerCase()))
+        );
+        if (!hasAllSkills) return false;
+      }
+      
+      // Check locations
+      if (selectedCities.length > 0 && !selectedCities.includes(job.city)) return false;
+      
+      return true;
+    });
+    
+    setFilteredJobs(filtered);
+    setShowResults(true);
+    setShowSkills(false); // Minimize filters
+    setShowLocation(false);
+    setContinueMessage(`${filtered.length} job${filtered.length === 1 ? '' : 's'} found matching your filters.`);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -195,35 +328,80 @@ export default function FilterPage() {
             </div>
           </div>
         </section>
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold text-slate-900">Continue with all filters</h2>
+              <p className="mt-2 text-sm text-slate-500">Define Skills, Location, and Time of ad, then use Continue to apply the full filter set.</p>
+            </div>
+            <button
+              onClick={handleContinue}
+              className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-slate-900/10 transition hover:bg-slate-800"
+            >
+              Continue
+            </button>
+          </div>
 
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-semibold text-slate-800">Skills</p>
+              <p className="mt-2 text-sm text-slate-500">{selectedSkills.length} selected</p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-semibold text-slate-800">Locations</p>
+              <p className="mt-2 text-sm text-slate-500">{selectedCities.length} selected</p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-semibold text-slate-800">Time of ad</p>
+              <select
+                value={selectedTime}
+                onChange={e => setSelectedTime(e.target.value)}
+                className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
+              >
+                {timeOptions.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {continueMessage && (
+            <div className="mt-5 rounded-3xl bg-slate-900/5 px-5 py-4 text-sm text-slate-700 ring-1 ring-slate-200">
+              {continueMessage}
+            </div>
+          )}
+        </section>
         <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
           <section className="rounded-[2rem] bg-white p-6 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-semibold text-slate-900">Skill Planner</h2>
                 <p className="mt-2 text-sm text-slate-500">Search, select, and preview the top skills for your job filters.</p>
               </div>
               <button
                 onClick={() => setShowSkills(prev => !prev)}
-                className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-100"
+                className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-100"
               >
-                {showSkills ? 'Hide' : 'Show'} skills
+                <span className={`transition-transform ${showSkills ? 'rotate-90' : ''}`}>▶</span>
+                {showSkills ? 'Collapse' : 'Expand'}
               </button>
             </div>
 
-            {showSkills ? (
-              <div className="mt-6 space-y-6">
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
-                  <label className="block text-sm font-medium text-slate-700">Search skills</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Financial modeling, Power BI, SQL"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
-                  />
-                </div>
+            <div className="mt-6 space-y-6">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                <label className="block text-sm font-medium text-slate-700">Search skills</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Financial modeling, Power BI, SQL"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
+                />
+              </div>
 
+              {showSkills && (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredSkills.map(skill => {
                     const selected = selectedSkills.includes(skill);
@@ -244,56 +422,39 @@ export default function FilterPage() {
                     );
                   })}
                 </div>
+              )}
 
-                <div className="rounded-[1.75rem] bg-slate-50 p-5 border border-slate-200">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Selected {selectedSkills.length} / 10</span>
-                    <p className="text-sm text-slate-500">Tap a tag to remove it.</p>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {selectedSkills.length === 0 ? (
-                      <span className="text-sm text-slate-500">No skills selected yet.</span>
-                    ) : (
-                      selectedSkills.map(skill => (
-                        <button
-                          key={skill}
-                          onClick={() => handleSkillToggle(skill)}
-                          className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-2 text-sm font-medium text-sky-900 transition hover:bg-sky-200"
-                        >
-                          {skill}
-                          <span className="rounded-full bg-sky-200 px-2 py-0.5 text-xs">×</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </div>
+              <div className="flex flex-wrap gap-3">
+                {selectedSkills.length === 0 ? (
+                  <span className="text-sm text-slate-500">No skills selected yet.</span>
+                ) : (
+                  selectedSkills.map(skill => (
+                    <button
+                      key={skill}
+                      onClick={() => handleSkillToggle(skill)}
+                      className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-2 text-sm font-medium text-sky-900 transition hover:bg-sky-200"
+                    >
+                      {skill}
+                      <span className="rounded-full bg-sky-200 px-2 py-0.5 text-xs">×</span>
+                    </button>
+                  ))
+                )}
               </div>
-            ) : (
-              <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
-                Skill selection is hidden. Click show to expand the choice panel.
-              </div>
-            )}
-
-            <button
-              className="mt-8 w-full rounded-full bg-slate-900 px-6 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={selectedSkills.length === 0}
-            >
-              Continue with selected skills
-            </button>
+            </div>
           </section>
 
           <section className="rounded-[2rem] bg-white p-6 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-semibold text-slate-900">Location Filter</h2>
                 <p className="mt-2 text-sm text-slate-500">Filter by EU cities or auto-select whole countries.</p>
               </div>
               <button
                 onClick={() => setShowLocation(prev => !prev)}
-                className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-100"
+                className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-100"
               >
-                {showLocation ? 'Hide' : 'Show'} locations
+                <span className={`transition-transform ${showLocation ? 'rotate-90' : ''}`}>▶</span>
+                {showLocation ? 'Collapse' : 'Expand'}
               </button>
             </div>
 
@@ -361,37 +522,73 @@ export default function FilterPage() {
                     </div>
                   </div>
                 </div>
-
-                <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-900">{selectedCities.length} selected</span>
-                    <p className="text-sm text-slate-500">Selected cities appear as removable tags.</p>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {selectedCities.length === 0 ? (
-                      <span className="text-sm text-slate-500">No locations selected yet.</span>
-                    ) : (
-                      selectedCities.map(city => (
-                        <button
-                          key={city}
-                          onClick={() => handleCityToggle(city)}
-                          className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-medium text-emerald-900 transition hover:bg-emerald-200"
-                        >
-                          {city}
-                          <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-xs">×</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </div>
               </div>
-            ) : (
-              <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
-                Location selection is hidden. Click show to expand city filters.
-              </div>
-            )}
+            ) : null}
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {selectedCities.length === 0 ? (
+                <span className="text-sm text-slate-500">No locations selected yet.</span>
+              ) : (
+                selectedCities.map(city => (
+                  <button
+                    key={city}
+                    onClick={() => handleCityToggle(city)}
+                    className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-medium text-emerald-900 transition hover:bg-emerald-200"
+                  >
+                    {city}
+                    <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-xs">×</span>
+                  </button>
+                ))
+              )}
+            </div>
           </section>
+
+          {showResults && (
+            <section className="rounded-[2rem] bg-white p-6 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200">
+              <div className="mb-6">
+                <h2 className="text-2xl font-semibold text-slate-900">Job Results</h2>
+                <p className="mt-2 text-sm text-slate-500">{continueMessage}</p>
+              </div>
+
+              {filteredJobs.length === 0 ? (
+                <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-8 text-center">
+                  <p className="text-slate-600">No jobs found matching your criteria. Try adjusting your filters.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredJobs.map(job => (
+                    <a
+                      key={job.id}
+                      href={job.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md hover:border-slate-300"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-slate-900">{job.title}</h3>
+                          <p className="mt-1 text-sm text-slate-500">{job.company} • {job.city}</p>
+                          <p className="mt-3 text-sm text-slate-700 line-clamp-3">{job.description}</p>
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {job.skills.slice(0, 5).map((skill, index) => (
+                              <span key={index} className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
+                                {skill}
+                              </span>
+                            ))}
+                            {job.skills.length > 5 && (
+                              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
+                                +{job.skills.length - 5} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </div>
       </div>
     </div>
